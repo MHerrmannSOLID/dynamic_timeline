@@ -20,12 +20,6 @@ class _GanttChartState extends State<GanttChart> {
       position: 0,
     ),
     TimelineItem(
-      startDateTime: DateTime(2022, 1, 4),
-      endDateTime: DateTime(2022, 1, 15),
-      child: const Event(title: 'Event 1'),
-      position: 0,
-    ),
-    TimelineItem(
       startDateTime: DateTime(2022, 1, 20),
       endDateTime: DateTime(2022, 2, 1),
       position: 1,
@@ -75,9 +69,9 @@ class _GanttChartState extends State<GanttChart> {
                               DateFormat('dd').format(date),
                             ),
                             alignment: FractionalOffset.center,
-                            transform: new Matrix4.identity()..rotateZ(-70 * 3.1415927 / 180),
+                            transform: Matrix4.identity()..rotateZ(-70 * 3.1415927 / 180),
                           ),
-                          SizedBox(width: double.infinity, height: 3)
+                          const SizedBox(width: double.infinity, height: 3)
                         ])),
                 axis: Axis.horizontal,
                 intervalDuration: const Duration(days: 1),

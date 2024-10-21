@@ -1,16 +1,16 @@
-import '../dynamic_timeline_layout.dart';
+// ignore_for_file: public_member_api_docs, lines_longer_than_80_chars
+import 'package:dynamic_timeline/src/rendering/painter/dynamic_timeline_painter.dart';
 import 'package:flutter/material.dart';
-import 'dynamic_timeline_painter.dart';
 
-class HorizontalTimelinePainter extends DynamicTimelinePainter{
-  HorizontalTimelinePainter({required DynamicTimelineLayout layouter, required Paint linePaint, required TextStyle labelTextStyle}) :
-        super(layouter: layouter, linePaint: linePaint, labelTextStyle: labelTextStyle);
+class HorizontalTimelinePainter extends DynamicTimelinePainter {
+  HorizontalTimelinePainter({
+    required super.layouter,
+    required super.linePaint,
+    required super.labelTextStyle,
+  });
 
-
-  Offset _currentOffset = Offset(0,0);
-
-  void paint(Canvas canvas, Offset offset, Size size){
-
+  @override
+  void paint(Canvas canvas, Offset offset, Size size) {
     // paint line
     canvas.drawLine(
       Offset(
@@ -23,8 +23,5 @@ class HorizontalTimelinePainter extends DynamicTimelinePainter{
       ),
       linePaint,
     );
-
-    _currentOffset = Offset( offset.dx, offset.dy + layouter.maxCrossAxisIndicatorExtent - DynamicTimelinePainter.labelSpacing);
   }
-
 }

@@ -2,7 +2,6 @@ import 'package:dynamic_timeline/dynamic_timeline.dart';
 import 'package:dynamic_timeline_example/widgets/week_header.dart';
 import 'package:dynamic_timeline_example/widgets/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class WeekHeaderGantt extends StatefulWidget {
   const WeekHeaderGantt({Key? key}) : super(key: key);
@@ -68,7 +67,7 @@ class _WeekHeaderGanttState extends State<WeekHeaderGantt> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Colored Gantt Chart')),
+      appBar: AppBar(title: const Text('Week header Gantt Chart')),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(10),
@@ -96,15 +95,15 @@ class _WeekHeaderGanttState extends State<WeekHeaderGantt> {
                 intervalPainters: [
                   ColoredIntervalPainter.createHorizontal(
                       intervalSelector: (interval) => interval % 7 > 4,
-                      paint: Paint()..color = Color.fromARGB(255, 0xF5, 0xF5, 0xF5)),
+                      paint: Paint()..color = const Color.fromARGB(255, 0xF5, 0xF5, 0xF5)),
                   ColoredIntervalPainter.createHorizontal(
                       intervalSelector: (interval) => interval % 7 < 5,
                       paint: Paint()..color = Colors.white),
                   IntervalDecorationPainter.createHorizontal(
                       intervalSelector: (interval) => interval % 7 == 6 || interval % 7 == 4,
-                      paint: Paint()..color = Color.fromARGB(255, 0xcf, 0xcf, 0xcf)),
+                      paint: Paint()..color = const Color.fromARGB(255, 0xcf, 0xcf, 0xcf)),
                   IntervalDecorationPainter.createVertical(
-                      paint: Paint()..color = Color.fromARGB(255, 0xcf, 0xcf, 0xcf))
+                      paint: Paint()..color = const Color.fromARGB(255, 0xcf, 0xcf, 0xcf))
                 ],
                 //intervalPainters: [VerticalIntervalPainter()],
                 items: items,

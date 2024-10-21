@@ -1,6 +1,6 @@
-// ignore_for_file: public_member_api_docs
-
+// ignore_for_file: public_member_api_docs, lines_longer_than_80_chars
 import 'package:dynamic_timeline/dynamic_timeline.dart';
+import 'package:dynamic_timeline/src/rendering/dynamic_timeline_parent_data.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -37,8 +37,8 @@ class RenderTimelineItem extends RenderProxyBox
     markParentNeedsLayout();
   }
 
-  final bool _isTimelineLabelItem ;
-  bool  get isTimelineLabelItem => _isTimelineLabelItem;
+  final bool _isTimelineLabelItem;
+  bool get isTimelineLabelItem => _isTimelineLabelItem;
 
   DateTime _endDateTime;
 
@@ -105,7 +105,7 @@ class RenderTimelineItem extends RenderProxyBox
     _onEndDateTimeChanged = value;
   }
 
-  late final double _microsecondExtent;
+  late final double _secondExtent;
 
   late final Duration _minItemDuration;
 
@@ -134,7 +134,7 @@ class RenderTimelineItem extends RenderProxyBox
       if (details.delta.dy >= 0 ||
           globalDragPosition.dy <= globalBottomPosition - _minItemExtent) {
         duration = Duration(
-          microseconds: details.delta.dy ~/ _microsecondExtent,
+          seconds: details.delta.dy ~/ _secondExtent,
         );
       }
     } else {
@@ -142,7 +142,7 @@ class RenderTimelineItem extends RenderProxyBox
       if (details.delta.dx >= 0 ||
           globalDragPosition.dx <= globalRightPosition - _minItemExtent) {
         duration = Duration(
-          microseconds: details.delta.dx ~/ _microsecondExtent,
+          seconds: details.delta.dx ~/ _secondExtent,
         );
       }
     }
@@ -165,7 +165,7 @@ class RenderTimelineItem extends RenderProxyBox
       if (details.delta.dy <= 0 ||
           globalDragPosition.dy >= globalTopPosition + _minItemExtent) {
         duration = Duration(
-          microseconds: details.delta.dy ~/ _microsecondExtent,
+          seconds: details.delta.dy ~/ _secondExtent,
         );
       }
     } else {
@@ -173,7 +173,7 @@ class RenderTimelineItem extends RenderProxyBox
       if (details.delta.dx <= 0 ||
           globalDragPosition.dx >= globalLeftPosition + _minItemExtent) {
         duration = Duration(
-          microseconds: details.delta.dx ~/ _microsecondExtent,
+          seconds: details.delta.dx ~/ _secondExtent,
         );
       }
     }
@@ -211,11 +211,11 @@ class RenderTimelineItem extends RenderProxyBox
     parentData!.endDateTime = endDateTime;
     parentData!.position = position;
 
-    _microsecondExtent = parentData!.microsecondExtent;
+    _secondExtent = parentData!.secondExtent;
 
     _minItemDuration = parentData!.minItemDuration;
 
-    _minItemExtent = _minItemDuration.inMicroseconds * _microsecondExtent;
+    _minItemExtent = _minItemDuration.inSeconds * _secondExtent;
 
     _axis = parentData!.axis;
 

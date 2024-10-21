@@ -1,30 +1,13 @@
-import 'package:dynamic_timeline/src/rendering/painter/dynamic_timeline_painter.dart';
+// ignore_for_file: public_member_api_docs, lines_longer_than_80_chars,
+// ignore_for_file: curly_braces_in_flow_control_structures
 import 'package:dynamic_timeline/src/rendering/dynamic_timeline_layout.dart';
-import 'package:flutter/material.dart';
-import '../../dynamic_timeline.dart';
-import '../widgets/timeline_label_container.dart';
-import 'painter/interval_painter/interval_painter.dart';
-import 'painter/horizontal_timeline_painter.dart';
-import 'painter/interval_painter/background_painter_data.dart';
-import 'painter/vertical_timeline_painter.dart';
+import 'package:dynamic_timeline/src/rendering/dynamic_timeline_parent_data.dart';
+import 'package:dynamic_timeline/src/rendering/painter/dynamic_timeline_painter.dart';
+import 'package:dynamic_timeline/src/rendering/painter/horizontal_timeline_painter.dart';
+import 'package:dynamic_timeline/src/rendering/painter/interval_painter/interval_painter.dart';
+import 'package:dynamic_timeline/src/rendering/painter/vertical_timeline_painter.dart';
+import 'package:dynamic_timeline/src/rendering/render_timeline_item.dart';
 import 'package:flutter/rendering.dart';
-
-class DynamicTimelineParentData extends ContainerBoxParentData<RenderBox> {
-  DynamicTimelineParentData({
-    required this.microsecondExtent,
-    required this.minItemDuration,
-    required this.axis,
-    required this.resizable,
-  });
-
-  DateTime? startDateTime;
-  DateTime? endDateTime;
-  int? position;
-  final double microsecondExtent;
-  final Duration minItemDuration;
-  final Axis axis;
-  final bool resizable;
-}
 
 class RenderDynamicTimeline extends RenderBox
     with
@@ -58,25 +41,33 @@ class RenderDynamicTimeline extends RenderBox
         ),
         _maxCrossAxisIndicatorExtent = maxCrossAxisIndicatorExtent,
         _minItemDuration = minItemDuration,
-        _intervalPainters= intervalPainters,
+        _intervalPainters = intervalPainters,
         _resizable = resizable {
     _painter = axis == Axis.vertical
         ? VerticalTimelinePainter(
-            layouter: _layoutProcessor, linePaint: linePaint, labelTextStyle: labelTextStyle)
+            layouter: _layoutProcessor,
+            linePaint: linePaint,
+            labelTextStyle: labelTextStyle,
+          )
         : HorizontalTimelinePainter(
-            layouter: _layoutProcessor, linePaint: linePaint, labelTextStyle: labelTextStyle);
+            layouter: _layoutProcessor,
+            linePaint: linePaint,
+            labelTextStyle: labelTextStyle,
+          );
   }
 
   late final DynamicTimelinePainter _painter;
   final DynamicTimelineLayout _layoutProcessor;
 
-  final  List<IntervalPainter> _intervalPainters;
+  List<IntervalPainter> _intervalPainters;
+
   List<IntervalPainter> get intervalPainters => _intervalPainters;
+
   set intervalPainters(List<IntervalPainter> value) {
     if (value == _intervalPainters) return;
-    _intervalPainters.clear();
-    _intervalPainters.addAll(value);
-    markNeedsPaint();
+    _intervalPainters = value;
+    _intervalPainters.forEach(_layoutProcessor.updateLayoutData);
+    markParentNeedsLayout();
   }
 
   DateTime get firstDateTime => _layoutProcessor.firstDateTime;
@@ -203,7 +194,7 @@ class RenderDynamicTimeline extends RenderBox
   void setupParentData(covariant RenderObject child) {
     if (child.parentData is! DynamicTimelineParentData) {
       child.parentData = DynamicTimelineParentData(
-        microsecondExtent: intervalExtent / intervalDuration.inMicroseconds,
+        secondExtent: intervalExtent / intervalDuration.inSeconds,
         minItemDuration: minItemDuration,
         axis: axis,
         resizable: resizable,
@@ -226,16 +217,15 @@ class RenderDynamicTimeline extends RenderBox
   void performLayout() {
     _layoutProcessor.updateConstraints(constraints);
     size = _layoutProcessor.computeSize();
-    final maxCrossAxisItemExtent =
-        _layoutProcessor.getMaxCrossAxisItemExtent();
+    final maxCrossAxisItemExtent = _layoutProcessor.getMaxCrossAxisItemExtent();
 
     var child = firstChild;
 
     // define children layout and position
     while (child != null) {
-      if (!(child is RenderTimelineItem)) continue;
+      if (child is! RenderTimelineItem) continue;
 
-      final timeLineChild = child as RenderTimelineItem;
+      final timeLineChild = child;
       final childParentData = timeLineChild.parentData!;
 
       late final DateTime startDateTime;
@@ -248,15 +238,19 @@ class RenderDynamicTimeline extends RenderBox
 
       final childDuration = endDateTime.difference(startDateTime);
 
-      final childMainAxisExtent = _layoutProcessor.getExtentSecondRate() * childDuration.inSeconds;
+      final childMainAxisExtent =
+          _layoutProcessor.getExtentSecondRate() * childDuration.inSeconds;
 
       final differenceFromFirstDate = startDateTime.difference(firstDateTime);
 
-      final mainAxisPosition =
-          _layoutProcessor.getExtentSecondRate() * differenceFromFirstDate.inSeconds;
+      final mainAxisPosition = _layoutProcessor.getExtentSecondRate() *
+          differenceFromFirstDate.inSeconds;
 
-      final crossAxisPosition =
-          _getCrossAxisPositionFor(maxCrossAxisItemExtent, position, timeLineChild);
+      final crossAxisPosition = _getCrossAxisPosition(
+        maxCrossAxisItemExtent,
+        position,
+        timeLineChild,
+      );
 
       if (axis == Axis.vertical) {
         child.layout(
@@ -283,15 +277,17 @@ class RenderDynamicTimeline extends RenderBox
 
         childParentData.offset = Offset(mainAxisPosition, crossAxisPosition);
       }
-
       child = childParentData.nextSibling;
     }
-
+    _intervalPainters.forEach(_layoutProcessor.updateLayoutData);
   }
 
-  double _getCrossAxisPositionFor(
-      double maxCrossAxisItemExtent, int position, RenderTimelineItem? child) {
-    if (child?.isTimelineLabelItem ?? false == true)
+  double _getCrossAxisPosition(
+    double maxCrossAxisItemExtent,
+    int position,
+    RenderTimelineItem child,
+  ) {
+    if (child.isTimelineLabelItem)
       return (crossAxisSpacing + maxCrossAxisItemExtent) * position;
     return maxCrossAxisIndicatorExtent +
         crossAxisSpacing +
@@ -300,7 +296,6 @@ class RenderDynamicTimeline extends RenderBox
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    intervalPainters.forEach(_layoutProcessor.updateLayoutDataFor);
     context.pushClipRect(
       needsCompositing,
       offset,
@@ -308,8 +303,7 @@ class RenderDynamicTimeline extends RenderBox
       (context, offset) {
         final canvas = context.canvas;
 
-        print('painting ${intervalPainters.length} painters');
-        intervalPainters.forEach((painter)=> painter.paint(canvas,offset));
+        for (final painter in intervalPainters) painter.paint(canvas, offset);
 
         // paint children
         defaultPaint(context, offset);
@@ -320,22 +314,14 @@ class RenderDynamicTimeline extends RenderBox
   }
 
   @override
-  double computeMaxIntrinsicWidth(double height) {
-    return size.width;
-  }
+  double computeMaxIntrinsicWidth(double height) => size.width;
 
   @override
-  double computeMinIntrinsicWidth(double height) {
-    return size.width;
-  }
+  double computeMinIntrinsicWidth(double height) => size.width;
 
   @override
-  double computeMaxIntrinsicHeight(double width) {
-    return size.height;
-  }
+  double computeMaxIntrinsicHeight(double width) => size.height;
 
   @override
-  double computeMinIntrinsicHeight(double width) {
-    return size.height;
-  }
+  double computeMinIntrinsicHeight(double width) => size.height;
 }

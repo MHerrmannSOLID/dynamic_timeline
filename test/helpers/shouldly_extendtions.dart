@@ -1,3 +1,5 @@
+// ignore_for_file: lines_longer_than_80_chars
+
 import 'package:flutter/material.dart';
 import 'package:shouldly/shouldly.dart';
 
@@ -7,10 +9,10 @@ extension ColorShouldyExtension on Color {
 
 class ColorAssertions extends BaseAssertions<Color, ColorAssertions> {
   ColorAssertions(
-    Color? subject, {
-    bool isReversed = false,
-    String? subjectLabel,
-  }) : super(subject, isReversed: isReversed, subjectLabel: subjectLabel);
+    super.subject, {
+    super.isReversed,
+    super.subjectLabel,
+  });
 
   @override
   ColorAssertions be(Color expected) {
@@ -23,7 +25,11 @@ class ColorAssertions extends BaseAssertions<Color, ColorAssertions> {
   }
 
   @override
-  ColorAssertions copy(Color? subject, {bool isReversed = false, String? subjectLabel}) {
+  ColorAssertions copy(
+    Color? subject, {
+    bool isReversed = false,
+    String? subjectLabel,
+  }) {
     return ColorAssertions(
       subject,
       isReversed: isReversed,
