@@ -49,8 +49,13 @@ class DynamicTimeline extends MultiChildRenderObjectWidget {
         ),
         super(
             key: key,
-            children: items+labelBuilder.Create(firstDateTime,lastDateTime,intervalDuration??_getDefaultIntervalDuration(firstDateTime, lastDateTime))
-          );
+            children: items +
+                labelBuilder.Create(
+                    firstDateTime,
+                    lastDateTime,
+                    intervalDuration ??
+                        _getDefaultIntervalDuration(
+                            firstDateTime, lastDateTime)));
 
   /// The axis of the line.
   final Axis axis;
@@ -106,8 +111,6 @@ class DynamicTimeline extends MultiChildRenderObjectWidget {
   /// Used if [paint] is null.
   final double strokeWidth;
 
-
-
   /// The stroke cap of the line
   ///
   /// Used if [paint] is null.
@@ -118,14 +121,15 @@ class DynamicTimeline extends MultiChildRenderObjectWidget {
 
   @override
   RenderObject createRenderObject(BuildContext context) {
-    Duration defaultIntervalDuration = _getDefaultIntervalDuration(firstDateTime, lastDateTime);
+    Duration defaultIntervalDuration =
+        _getDefaultIntervalDuration(firstDateTime, lastDateTime);
 
     final defaultLinePaint = Paint()
       ..color = color
       ..strokeWidth = strokeWidth
       ..strokeCap = strokeCap;
 
-    final defaultLabelTextStyle = Theme.of(context).textTheme.bodyText1!;
+    final defaultLabelTextStyle = Theme.of(context).textTheme.bodyLarge!;
 
     return RenderDynamicTimeline(
       firstDateTime: firstDateTime,
@@ -145,7 +149,8 @@ class DynamicTimeline extends MultiChildRenderObjectWidget {
     );
   }
 
-  static Duration _getDefaultIntervalDuration(DateTime firstDateTime, DateTime lastDateTime) =>
+  static Duration _getDefaultIntervalDuration(
+          DateTime firstDateTime, DateTime lastDateTime) =>
       lastDateTime.difference(firstDateTime) ~/ 20;
 
   @override
@@ -153,14 +158,15 @@ class DynamicTimeline extends MultiChildRenderObjectWidget {
     BuildContext context,
     covariant RenderDynamicTimeline renderObject,
   ) {
-    var defaultIntervalDuration = _getDefaultIntervalDuration(firstDateTime, lastDateTime);
+    var defaultIntervalDuration =
+        _getDefaultIntervalDuration(firstDateTime, lastDateTime);
 
     final defaultLinePaint = Paint()
       ..color = color
       ..strokeWidth = strokeWidth
       ..strokeCap = strokeCap;
 
-    final defaultLabelTextStyle = Theme.of(context).textTheme.bodyText1!;
+    final defaultLabelTextStyle = Theme.of(context).textTheme.bodyLarge!;
 
     renderObject
       ..firstDateTime = firstDateTime
