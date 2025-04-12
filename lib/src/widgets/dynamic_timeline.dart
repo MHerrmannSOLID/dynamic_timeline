@@ -1,9 +1,9 @@
-// ignore_for_file: lines_longer_than_80_chars
-
 import 'package:dynamic_timeline/dynamic_timeline.dart';
-import 'package:dynamic_timeline/src/rendering/painter/interval_painter/interval_painter.dart';
-import 'package:dynamic_timeline/src/rendering/render_dynamic_timeline.dart';
+import 'package:dynamic_timeline/src/rendering/label_builder.dart';
 import 'package:flutter/material.dart';
+
+import '../rendering/painter/interval_painter/interval_painter.dart';
+import 'timeline_label_container.dart';
 
 /// {@template dynamic_timeline}
 /// A widget that displays a timeline and positions its children using their
@@ -18,11 +18,9 @@ import 'package:flutter/material.dart';
 class DynamicTimeline extends MultiChildRenderObjectWidget {
   /// {@macro dynamic_timeline}
   DynamicTimeline({
+    Key? key,
     required this.firstDateTime,
     required this.lastDateTime,
-    required LabelBuilder labelBuilder,
-    required List<TimelineItem> items,
-    super.key,
     this.axis = Axis.vertical,
     this.intervalDuration,
     this.intervalExtent = 100,
@@ -38,6 +36,8 @@ class DynamicTimeline extends MultiChildRenderObjectWidget {
     this.paint,
     this.textStyle,
     this.intervalPainters = const [],
+    required LabelBuilder labelBuilder,
+    required List<TimelineItem> items,
   })  : assert(
           maxCrossAxisItemExtent != double.infinity,
           "max cross axis item extent can't be infinite. ",
@@ -48,14 +48,14 @@ class DynamicTimeline extends MultiChildRenderObjectWidget {
           'firstDateTime: $firstDateTime --- lastDateTime: $lastDateTime',
         ),
         super(
-          children: items +
-              labelBuilder.create(
-                firstDateTime,
-                lastDateTime,
-                intervalDuration ??
-                    _getDefaultIntervalDuration(firstDateTime, lastDateTime),
-              ),
-        );
+            key: key,
+            children: items +
+                labelBuilder.Create(
+                    firstDateTime,
+                    lastDateTime,
+                    intervalDuration ??
+                        _getDefaultIntervalDuration(
+                            firstDateTime, lastDateTime)));
 
   /// The axis of the line.
   final Axis axis;
@@ -121,7 +121,7 @@ class DynamicTimeline extends MultiChildRenderObjectWidget {
 
   @override
   RenderObject createRenderObject(BuildContext context) {
-    final defaultIntervalDuration =
+    Duration defaultIntervalDuration =
         _getDefaultIntervalDuration(firstDateTime, lastDateTime);
 
     final defaultLinePaint = Paint()
@@ -129,7 +129,7 @@ class DynamicTimeline extends MultiChildRenderObjectWidget {
       ..strokeWidth = strokeWidth
       ..strokeCap = strokeCap;
 
-    final defaultLabelTextStyle = Theme.of(context).textTheme.bodyLarge!;
+    final defaultLabelTextStyle = Theme.of(context).textTheme.bodyMedium!;
 
     return RenderDynamicTimeline(
       firstDateTime: firstDateTime,
@@ -150,9 +150,7 @@ class DynamicTimeline extends MultiChildRenderObjectWidget {
   }
 
   static Duration _getDefaultIntervalDuration(
-    DateTime firstDateTime,
-    DateTime lastDateTime,
-  ) =>
+          DateTime firstDateTime, DateTime lastDateTime) =>
       lastDateTime.difference(firstDateTime) ~/ 20;
 
   @override
@@ -160,7 +158,7 @@ class DynamicTimeline extends MultiChildRenderObjectWidget {
     BuildContext context,
     covariant RenderDynamicTimeline renderObject,
   ) {
-    final defaultIntervalDuration =
+    var defaultIntervalDuration =
         _getDefaultIntervalDuration(firstDateTime, lastDateTime);
 
     final defaultLinePaint = Paint()
@@ -168,7 +166,7 @@ class DynamicTimeline extends MultiChildRenderObjectWidget {
       ..strokeWidth = strokeWidth
       ..strokeCap = strokeCap;
 
-    final defaultLabelTextStyle = Theme.of(context).textTheme.bodyLarge!;
+    final defaultLabelTextStyle = Theme.of(context).textTheme.bodyMedium!;
 
     renderObject
       ..firstDateTime = firstDateTime
