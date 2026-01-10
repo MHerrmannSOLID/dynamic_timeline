@@ -1,5 +1,6 @@
 import 'package:dynamic_timeline/dynamic_timeline.dart';
 import 'package:dynamic_timeline/src/rendering/label_builder.dart';
+import 'package:dynamic_timeline/src/rendering/render_dynamic_timeline.dart';
 import 'package:flutter/material.dart';
 
 import '../rendering/painter/interval_painter/interval_painter.dart';
@@ -50,7 +51,7 @@ class DynamicTimeline extends MultiChildRenderObjectWidget {
         super(
             key: key,
             children: items +
-                labelBuilder.Create(
+                labelBuilder.create(
                     firstDateTime,
                     lastDateTime,
                     intervalDuration ??
